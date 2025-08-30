@@ -6,9 +6,9 @@ export default function HomePage() {
       <div className="jumbotron text-center p-4 bg-light rounded mb-5">
         <h1 className="display-4 text-primary">Welcome to Shop</h1>
         <p className="lead">Quality products for everyday needs—all in one place.</p>
-        <a href="/products" className="btn btn-success btn-lg">
+        <link href="/products" className="btn btn-success btn-lg">
           Shop Now
-        </a>
+        </link>
       </div>
 
       
@@ -17,13 +17,13 @@ export default function HomePage() {
         <div className="row">
           {['Electronics', 'Apparel', 'Home'].map((cat) => (
             <div key={cat} className="col-md-4 mb-4">
-              <a href="/products" className="text-decoration-none">
+              <link href="/products" className="text-decoration-none">
                 <div className="card bg-dark text-white h-100">
                   <div className="card-body d-flex justify-content-center align-items-center">
                     <h5 className="card-title">{cat}</h5>
                   </div>
                 </div>
-              </a>
+              </link>
             </div>
           ))}
         </div>
@@ -45,9 +45,9 @@ export default function HomePage() {
     
       <section className="text-center mb-5">
         <h4>Keep Shopping?</h4>
-        <a href="/products" className="btn btn-primary">
+        <link href="/products" className="btn btn-primary">
           Explore All Products
-        </a>
+        </link>
       </section>
     </div>
   );
