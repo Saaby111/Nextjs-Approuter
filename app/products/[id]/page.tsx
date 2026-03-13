@@ -38,10 +38,7 @@ export default async function ProductDetail({ params }: ProductPageProps) {
   const { id } = params;
 
   const product = await fetchProduct(id);
-
-  if (!product) {
-    notFound(); // Redirects to closest not-found page
-  }
+if (!product || !product.id) notFound();
 
   return (
     <div className="container mt-4">
