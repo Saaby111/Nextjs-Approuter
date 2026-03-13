@@ -1,4 +1,4 @@
-import AddToCart from "../../component/add-to-cart";
+import AddToCart from "../../component/AddToCart"; 
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
