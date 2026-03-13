@@ -10,7 +10,9 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
+  // Extend Next.js ESLint configs
   ...compat.extends("next/core-web-vitals", "next/typescript"),
+  // Add custom ignores
   {
     ignores: [
       "node_modules/**",
