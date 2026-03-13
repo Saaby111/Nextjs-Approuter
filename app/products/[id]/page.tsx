@@ -1,5 +1,4 @@
-// app/products/[id]/page.tsx
-import AddToCart from "../../products/[id]/add-to-cart";
+import AddToCart from "../../products/add-to-cart";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
