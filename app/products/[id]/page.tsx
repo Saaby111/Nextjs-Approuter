@@ -1,5 +1,13 @@
-import AddToCart from "../../products/[id]/add-to-cart";
+import AddToCart from "./add-to-cart";
 import { notFound } from "next/navigation";
+
+interface Product {
+  id: number;
+  title: string;
+  price: number;
+  description: string;
+  image: string;
+}
 
 export default async function ProductDetail({
   params,
@@ -8,28 +16,29 @@ export default async function ProductDetail({
 }) {
   const { id } = await params;
 
-  let product;
+  let product: Product | null = null;
+  let error: string | null = null;
+
   try {
     const res = await fetch(`https://fakestoreapi.com/products/${id}`, {
-      cache: "no-store",
+      cache: "no-store", // don't cache, always fetch fresh
     });
 
     if (!res.ok) {
-      // If product not found or API error, trigger 404
       if (res.status === 404) {
-        notFound();
+        notFound(); // shows the closest not-found page
       }
-      throw new Error(`Failed to fetch product: ${res.status}`);
+      throw new Error(`API responded with ${res.status}`);
     }
 
     product = await res.json();
-  } catch (error) {
-    console.error("Error fetching product:", error);
-    // You could also throw a custom error or redirect to an error page
-    throw new Error("Failed to load product details. Please try again.");
+  } catch (err: any) {
+    // Log the error on the server (visible in Vercel logs)
+    console.error(`Failed to fetch product ${id}:`, err.message);
+    error = err.message;
   }
 
-  // If product is missing expected fields, handle gracefully
+  // If product is missing essential data, treat as not found
   if (!product || !product.id) {
     notFound();
   }
@@ -42,14 +51,15 @@ export default async function ProductDetail({
             src={product.image}
             alt={product.title}
             className="img-fluid"
+            style={{ maxHeight: "400px", objectFit: "contain" }}
           />
         </div>
 
         <div className="col-md-6">
           <h3>{product.title}</h3>
-          <p>{product.description}</p>
+          <p className="text-muted">{product.description}</p>
           <h4 className="text-success">
-            ${product.price?.toFixed(2) ?? "N/A"}
+            ${product.price.toFixed(2)}
           </h4>
 
           <AddToCart
