@@ -12,36 +12,29 @@ interface Product {
 export default async function ProductDetail({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string }; // <-- fix type here
 }) {
-  const { id } = await params;
+  const { id } = params; // <-- remove await
 
   let product: Product | null = null;
-  let error: string | null = null;
 
   try {
     const res = await fetch(`https://fakestoreapi.com/products/${id}`, {
-      cache: "no-store", // don't cache, always fetch fresh
+      cache: "no-store",
     });
 
     if (!res.ok) {
-      if (res.status === 404) {
-        notFound(); // shows the closest not-found page
-      }
+      if (res.status === 404) notFound();
       throw new Error(`API responded with ${res.status}`);
     }
 
     product = await res.json();
   } catch (err: any) {
-    // Log the error on the server (visible in Vercel logs)
     console.error(`Failed to fetch product ${id}:`, err.message);
-    error = err.message;
+    notFound(); // fallback to not-found page
   }
 
-  // If product is missing essential data, treat as not found
-  if (!product || !product.id) {
-    notFound();
-  }
+  if (!product || !product.id) notFound();
 
   return (
     <div className="container mt-4">
@@ -58,9 +51,7 @@ export default async function ProductDetail({
         <div className="col-md-6">
           <h3>{product.title}</h3>
           <p className="text-muted">{product.description}</p>
-          <h4 className="text-success">
-            ${product.price.toFixed(2)}
-          </h4>
+          <h4 className="text-success">${product.price.toFixed(2)}</h4>
 
           <AddToCart
             id={product.id}
