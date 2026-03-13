@@ -1,7 +1,7 @@
 "use client";
 
 import { useCart } from "../cart/cart-context";
-import "./add-to-cart.css";
+import "./AddToCart";
 
 export default function AddToCart({
   id,
