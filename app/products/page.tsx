@@ -12,24 +12,31 @@ interface Product {
 
 async function fetchProducts(): Promise<Product[]> {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
+
     const res = await fetch("https://fakestoreapi.com/products", {
-      // Force fresh fetch on every request
       cache: "no-store",
-    });
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timeoutId));
 
     if (!res.ok) {
-      console.error("Products API failed:", res.status);
+      console.error(`API responded with ${res.status}: ${res.statusText}`);
       return [];
     }
 
-    const data = await res.json().catch((err) => {
-      console.error("Failed to parse JSON:", err);
+    const data = await res.json();
+    if (!Array.isArray(data)) {
+      console.error("API returned non-array data:", data);
       return [];
+    }
+    return data;
+  } catch (err: any) {
+    console.error("Failed to fetch products:", {
+      name: err.name,
+      message: err.message,
+      cause: err.cause,
     });
-
-    return Array.isArray(data) ? data : [];
-  } catch (err) {
-    console.error("Fetch error:", err);
     return [];
   }
 }
