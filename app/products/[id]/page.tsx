@@ -20,9 +20,13 @@ export default async function ProductDetail({
   let product: Product | null = null;
 
  try {
-  const res = await fetch(`https://fakestoreapi.com/products/${id}`, {
-    cache: "no-store",
-  });
+ const res = await fetch(`https://fakestoreapi.com/products/${id}`, {
+  cache: "no-store",
+  headers: {
+    'User-Agent': 'Next.js App (your-app-name)',
+    'Accept': 'application/json',
+  },
+});
 
   if (!res.ok) {
     console.error(`API responded with ${res.status} for ID ${id}`);
