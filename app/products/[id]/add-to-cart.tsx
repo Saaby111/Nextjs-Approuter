@@ -1,17 +1,23 @@
-'use client';
-import { useCart } from '../../cart/cart-context';
+"use client";
 
-export default function AddToCart({ id, title, price }: { id: number; title: string; price: number }) {
+import { useCart } from "../../cart/cart-context";
+import "./add-to-cart.css";
+
+export default function AddToCart({
+  id,
+  title,
+  price,
+}: {
+  id: number;
+  title: string;
+  price: number;
+}) {
   const { actions } = useCart();
+
   return (
     <button
+      className="btn-add-to-cart"
       onClick={() => actions.add({ id, title, price })}
-      style={{
-        padding: '10px 16px',
-        borderRadius: 8,
-        border: '1px solid #ddd',
-        cursor: 'pointer',
-      }}
     >
       Add to Cart
     </button>

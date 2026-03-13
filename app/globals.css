@@ -42,3 +42,22 @@ a {
     color-scheme: dark;
   }
 }
+.btn-add-to-cart {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background-color: #ffc107; /* bootstrap warning color */
+  color: #000;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-add-to-cart:hover {
+  background-color: #e0a800; /* darker on hover */
+  transform: scale(1.05); /* slight pop effect */
+}
+
+.btn-add-to-cart:active {
+  background-color: #d39e00; /* darker on click */
+  transform: scale(0.98); /* click press effect */
+}

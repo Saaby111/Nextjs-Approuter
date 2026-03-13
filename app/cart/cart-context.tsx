@@ -2,7 +2,6 @@
 
 import React from 'react';
 
-
 export type CartItem = {
   id: number;
   title: string;
@@ -10,36 +9,37 @@ export type CartItem = {
   quantity: number;
 };
 
-
 type CartState = { items: CartItem[] };
+
 type CartActions = {
   add: (item: Omit<CartItem, 'quantity'>) => void;
   remove: (id: number) => void;
   clear: () => void;
 };
 
-
-const CartContext = React.createContext<{ state: CartState; actions: CartActions } | null>(null);
-
+const CartContext = React.createContext<
+  { state: CartState; actions: CartActions } | null
+>(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = React.useState<CartState>({ items: [] });
+  const [state, setState] = React.useState<CartState>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("cart");
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    }
+    return { items: [] };
+  });
 
-  
   React.useEffect(() => {
-    const raw = localStorage.getItem('cart');
-    if (raw) setState(JSON.parse(raw));
-  }, []);
-
-  
-  React.useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(state));
+    localStorage.setItem("cart", JSON.stringify(state));
   }, [state]);
 
-  
-  const add: CartActions['add'] = (item) => {
+  const add: CartActions["add"] = (item) => {
     setState((prev) => {
       const existing = prev.items.find((i) => i.id === item.id);
+
       if (existing) {
         return {
           items: prev.items.map((i) =>
@@ -47,16 +47,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           ),
         };
       }
-      return { items: [...prev.items, { ...item, quantity: 1 }] };
+
+      return {
+        items: [...prev.items, { ...item, quantity: 1 }],
+      };
     });
   };
 
-  
-  const remove: CartActions['remove'] = (id) =>
-    setState((prev) => ({ items: prev.items.filter((i) => i.id !== id) }));
+  const remove: CartActions["remove"] = (id) =>
+    setState((prev) => ({
+      items: prev.items.filter((i) => i.id !== id),
+    }));
 
-  
-  const clear: CartActions['clear'] = () => setState({ items: [] });
+  const clear: CartActions["clear"] = () => setState({ items: [] });
 
   return (
     <CartContext.Provider value={{ state, actions: { add, remove, clear } }}>
@@ -65,9 +68,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-
 export function useCart() {
   const ctx = React.useContext(CartContext);
-  if (!ctx) throw new Error('useCart must be used within CartProvider');
+
+  if (!ctx) {
+    throw new Error("useCart must be used within CartProvider");
+  }
+
   return ctx;
 }
