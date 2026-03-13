@@ -36,7 +36,7 @@ async function fetchProduct(id: string): Promise<Product | null> {
 
 export default async function ProductDetail({ params }: ProductPageProps) {
   const { id } = params;
-
+  console.log("Params ID:", id);
   const product = await fetchProduct(id);
 if (!product || !product.id) notFound();
 
