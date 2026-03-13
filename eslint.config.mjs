@@ -1,42 +1,16 @@
-// eslint.config.js
-import js from "@eslint/js";
-import nextPlugin from "@next/eslint-plugin-next";
-import typescriptParser from "@typescript-eslint/parser";
-import typescriptPlugin from "@typescript-eslint/eslint-plugin";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import { FlatCompat } from "@eslint/eslintrc";
 
-export default [
-  // Base JavaScript/TypeScript rules
-  js.configs.recommended,
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-  // TypeScript support
-  {
-    files: ["**/*.ts", "**/*.tsx"],
-    languageOptions: {
-      parser: typescriptParser,
-      parserOptions: {
-        project: "./tsconfig.json",
-      },
-    },
-    plugins: {
-      "@typescript-eslint": typescriptPlugin,
-    },
-    rules: {
-      ...typescriptPlugin.configs.recommended.rules,
-    },
-  },
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+});
 
-  // Next.js specific rules
-  {
-    plugins: {
-      "@next/next": nextPlugin,
-    },
-    rules: {
-      ...nextPlugin.configs.recommended.rules,
-      ...nextPlugin.configs["core-web-vitals"].rules,
-    },
-  },
-
-  // Global ignores
+const eslintConfig = [
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     ignores: [
       "node_modules/**",
@@ -47,3 +21,5 @@ export default [
     ],
   },
 ];
+
+export default eslintConfig;
