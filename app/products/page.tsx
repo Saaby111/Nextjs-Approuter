@@ -1,7 +1,7 @@
-// This ensures Next.js does not prerender this page at build time
-export const dynamic = "force-dynamic";
+'use client';
 
-import React from "react";
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 interface Product {
   id: number;
@@ -10,48 +10,60 @@ interface Product {
   image: string;
 }
 
-async function fetchProducts(): Promise<Product[]> {
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
+export default function ProductsPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-    const res = await fetch("https://fakestoreapi.com/products", {
-      cache: "no-store",
-      signal: controller.signal,
-    }).finally(() => clearTimeout(timeoutId));
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch('https://fakestoreapi.com/products');
+        if (!res.ok) {
+          throw new Error(`API responded with ${res.status}`);
+        }
+        const data = await res.json();
+        if (!Array.isArray(data)) {
+          throw new Error('API returned non-array data');
+        }
+        setProducts(data);
+      } catch (err: any) {
+        console.error('Failed to fetch products:', err);
+        setError(err.message || 'Failed to load products');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (!res.ok) {
-      console.error(`API responded with ${res.status}: ${res.statusText}`);
-      return [];
-    }
+    fetchProducts();
+  }, []);
 
-    const data = await res.json();
-    if (!Array.isArray(data)) {
-      console.error("API returned non-array data:", data);
-      return [];
-    }
-    return data;
-  } catch (err: any) {
-    console.error("Failed to fetch products:", {
-      name: err.name,
-      message: err.message,
-      cause: err.cause,
-    });
-    return [];
+  if (loading) {
+    return (
+      <div className="container mt-4 text-center">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
   }
-}
 
-export default async function ProductsPage() {
-  const products = await fetchProducts();
+  if (error) {
+    return (
+      <div className="container mt-4">
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mt-4">
       <h2 className="mb-4">Products</h2>
 
       {products.length === 0 ? (
-        <p className="text-center text-muted">
-          No products available right now.
-        </p>
+        <p className="text-center text-muted">No products available right now.</p>
       ) : (
         <div className="row">
           {products.map((p) => (
@@ -61,19 +73,14 @@ export default async function ProductsPage() {
                   src={p.image}
                   className="card-img-top p-3"
                   alt={p.title}
-                  style={{ height: "200px", objectFit: "contain" }}
+                  style={{ height: '200px', objectFit: 'contain' }}
                 />
                 <div className="card-body d-flex flex-column">
                   <h5 className="card-title">{p.title}</h5>
-                  <p className="card-text text-success">
-                    ${p.price.toFixed(2)}
-                  </p>
-                  <a
-                    href={`/products/${p.id}`}
-                    className="btn btn-primary mt-auto"
-                  >
+                  <p className="card-text text-success">${p.price.toFixed(2)}</p>
+                  <Link href={`/products/${p.id}`} className="btn btn-primary mt-auto">
                     View Details
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
