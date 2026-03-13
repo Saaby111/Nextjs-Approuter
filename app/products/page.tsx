@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic"; // fetch on each request
+export const dynamic = "force-dynamic";
 
 import React from "react";
 
@@ -12,7 +12,7 @@ interface Product {
 async function fetchProducts(): Promise<Product[]> {
   try {
     const res = await fetch("https://fakestoreapi.com/products", {
-      // no caching at build time, always fresh
+      // Always fetch fresh on request
       next: { revalidate: 60 },
     });
 
@@ -21,11 +21,13 @@ async function fetchProducts(): Promise<Product[]> {
       return [];
     }
 
+    // Attempt to parse JSON safely
     const data = await res.json().catch((err) => {
       console.error("Failed to parse JSON:", err);
       return [];
     });
 
+    // Ensure it’s an array
     return Array.isArray(data) ? data : [];
   } catch (err) {
     console.error("Fetch error:", err);
@@ -57,9 +59,7 @@ export default async function ProductsPage() {
                 />
                 <div className="card-body d-flex flex-column">
                   <h5 className="card-title">{p.title}</h5>
-                  <p className="card-text text-success">
-                    ${p.price.toFixed(2)}
-                  </p>
+                  <p className="card-text text-success">${p.price.toFixed(2)}</p>
                   <a
                     href={`/products/${p.id}`}
                     className="btn btn-primary mt-auto"
