@@ -1,4 +1,5 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic"; // fetch on each request
+
 import React from "react";
 
 interface Product {
@@ -8,26 +9,23 @@ interface Product {
   image: string;
 }
 
-// Always return a safe array even if fetch fails
 async function fetchProducts(): Promise<Product[]> {
   try {
     const res = await fetch("https://fakestoreapi.com/products", {
-      next: { revalidate: 60 }, // revalidate cache every 60s
+      // no caching at build time, always fresh
+      next: { revalidate: 60 },
     });
 
-    // If API did not return a successful response, return empty array
     if (!res.ok) {
-      console.error("Products API failed:", res.status);
+      console.error("Products API failed status:", res.status);
       return [];
     }
 
-    // Try to parse JSON but safely catch if it fails
     const data = await res.json().catch((err) => {
       console.error("Failed to parse JSON:", err);
       return [];
     });
 
-    // If data is not an array, return empty array
     return Array.isArray(data) ? data : [];
   } catch (err) {
     console.error("Fetch error:", err);
@@ -59,7 +57,9 @@ export default async function ProductsPage() {
                 />
                 <div className="card-body d-flex flex-column">
                   <h5 className="card-title">{p.title}</h5>
-                  <p className="card-text text-success">${p.price.toFixed(2)}</p>
+                  <p className="card-text text-success">
+                    ${p.price.toFixed(2)}
+                  </p>
                   <a
                     href={`/products/${p.id}`}
                     className="btn btn-primary mt-auto"
