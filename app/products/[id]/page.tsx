@@ -9,29 +9,57 @@ interface Product {
   image: string;
 }
 
-interface Props {
-  params: { id: string };
-}
+export default async function ProductDetail({
+  params,
+}: {
+  params: Promise<{ id: string }>; // 👈 Type as Promise
+}) {
+  const { id } = await params; // 👈 Await the Promise
 
-async function fetchProduct(id: string): Promise<Product | null> {
+  let product: Product | null = null;
+
   try {
-    const res = await fetch(`https://fakestoreapi.com/products/${id}`, { cache: "no-store" });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (err) {
-    return null;
-  }
-}
+    const res = await fetch(`https://fakestoreapi.com/products/${id}`, {
+      cache: "no-store",
+    });
 
-export default async function ProductDetail({ params }: Props) {
-  const { id } = params;
-  const product = await fetchProduct(id);
-  if (!product) notFound();
+    if (!res.ok) {
+      if (res.status === 404) notFound();
+      throw new Error(`API responded with ${res.status}`);
+    }
+
+    product = await res.json();
+  } catch (err: any) {
+    console.error(`Failed to fetch product ${id}:`, err.message);
+    notFound(); // fallback to not-found page
+  }
+
+  if (!product || !product.id) notFound();
 
   return (
-    <div>
-      <h1>{product.title}</h1>
-      <AddToCart id={product.id} title={product.title} price={product.price} />
+    <div className="container mt-4">
+      <div className="row">
+        <div className="col-md-6">
+          <img
+            src={product.image}
+            alt={product.title}
+            className="img-fluid"
+            style={{ maxHeight: "400px", objectFit: "contain" }}
+          />
+        </div>
+
+        <div className="col-md-6">
+          <h3>{product.title}</h3>
+          <p className="text-muted">{product.description}</p>
+          <h4 className="text-success">${product.price.toFixed(2)}</h4>
+
+          <AddToCart
+            id={product.id}
+            title={product.title}
+            price={product.price}
+          />
+        </div>
+      </div>
     </div>
   );
 }

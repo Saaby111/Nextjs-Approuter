@@ -22,15 +22,23 @@ const CartContext = React.createContext<
 >(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = React.useState<CartState>(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("cart");
-      if (stored) {
-        return JSON.parse(stored);
+ const [state, setState] = React.useState<CartState>(() => {
+  if (typeof window !== "undefined") {
+    const stored = localStorage.getItem("cart");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        // Ensure it's an object with an items array
+        if (parsed && Array.isArray(parsed.items)) {
+          return parsed as CartState;
+        }
+      } catch {
+        // Invalid JSON – ignore and return default
       }
     }
-    return { items: [] };
-  });
+  }
+  return { items: [] };
+});
 
   React.useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(state));
