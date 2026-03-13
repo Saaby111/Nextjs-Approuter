@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import AddToCart from "../../component/AddToCart";
 import { notFound } from "next/navigation";
 
@@ -18,21 +19,22 @@ export default async function ProductDetail({
 
   let product: Product | null = null;
 
-  try {
-    const res = await fetch(`https://fakestoreapi.com/products/${id}`, {
-      cache: "no-store",
-    });
+ try {
+  const res = await fetch(`https://fakestoreapi.com/products/${id}`, {
+    cache: "no-store",
+  });
 
-    if (!res.ok) {
-      if (res.status === 404) notFound();
-      throw new Error(`API responded with ${res.status}`);
-    }
-
-    product = await res.json();
-  } catch (err: any) {
-    console.error(`Failed to fetch product ${id}:`, err.message);
-    notFound(); // fallback to not-found page
+  if (!res.ok) {
+    console.error(`API responded with ${res.status} for ID ${id}`);
+    if (res.status === 404) notFound();
+    throw new Error(`API responded with ${res.status}`);
   }
+
+  product = await res.json();
+} catch (err: any) {
+  console.error(`Failed to fetch product ${id}:`, err.message, err.stack);
+  notFound();
+}
 
   if (!product || !product.id) notFound();
 
