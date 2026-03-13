@@ -12,7 +12,7 @@ export default function Navbar() {
     setMounted(true);
   }, []);
 
-  const totalItems = state.items.reduce((sum, item) => sum + item.quantity, 0);
+ const totalItems = (state?.items || []).reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light mb-4">
