@@ -1,4 +1,6 @@
+export const dynamic = 'force-dynamic';
 import React from "react";
+
 
 interface Product {
   id: number;
