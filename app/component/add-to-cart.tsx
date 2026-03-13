@@ -1,6 +1,6 @@
 "use client";
 
-import { useCart } from "../../cart/cart-context";
+import { useCart } from "../cart/cart-context";
 import "./add-to-cart.css";
 
 export default function AddToCart({
